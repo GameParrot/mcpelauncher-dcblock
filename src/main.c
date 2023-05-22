@@ -23,7 +23,7 @@ void __attribute__ ((visibility ("default"))) mod_preinit() {
     preinithook mcpelauncher_preinithook;
     *(void**)(&mcpelauncher_preinithook) = dlsym(h, "mcpelauncher_preinithook");
     mcpelauncher_preinithook("_ZN5Mouse4feedEcassss", (void*)&Mouse_feed, (void**)&Mouse_feed_org);
-    dlclose(h);
+    //dlclose(h);
 }
 __attribute__ ((visibility ("default"))) void mod_init() {
 }
