@@ -7,11 +7,18 @@ long getEpochTime() {
 }
 char (*Mouse_feed_org)(char, signed char, short, short, short, short);
 long oms = 0;
+long oms1 = 0;
 void Mouse_feed(char a, signed char b, short c, short d, short e, short f) {
     if (a == 1 && b == 1) {
         if (getEpochTime() - oms > 50) {
             Mouse_feed_org(a,b,c,d,e,f);
             oms = getEpochTime();
+        }
+    } else if (a == 2 && b == 1) {
+        if (getEpochTime() - oms1 > 50) {
+            Mouse_feed_org(a,b,c,d,e,f);
+            // Uncomment the line below to enable blocking right double clicks
+            //oms1 = getEpochTime();
         }
     } else {
         Mouse_feed_org(a,b,c,d,e,f);
