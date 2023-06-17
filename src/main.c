@@ -11,7 +11,7 @@ bool blockRightDc = false;
 bool logClicks = false;
 bool hasInited = false; // Workaround mcpelauncher mod loading bug
 #if defined(__i386__) || defined(__arm__)
-ssize_t getline(char **restrict lineptr, size_t *restrict n,
+typedef ssize_t (*getlinec)(char **restrict lineptr, size_t *restrict n,
                        FILE *restrict stream);
 #endif
 long getEpochTime() {
@@ -66,7 +66,14 @@ void __attribute__ ((visibility ("default"))) mod_preinit() {
         }
 
         fp = fopen("/data/data/com.mojang.minecraftpe/dcblock.conf", "r");
+#if defined(__i386__) || defined(__arm__)
+        getlinec getline32;
+        void* clib = dlopen("libc.so", 0);
+        *(void**)(&getline32) = dlsym(clib, "getline"); // Workaround getline link issue on 32bit
         while ((read = getline(&line, &len, fp)) != -1) {
+#else
+        while ((read = getline(&line, &len, fp)) != -1) {
+#endif
             char *token = strtok(line, "=");
             if (strcmp(token,"BlockRightDc") == 0) {
                 char* token1 = strtok(NULL, "=");
