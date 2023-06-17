@@ -3,9 +3,7 @@
 #include <stdlib.h>
 #include <android/log.h>
 #include <stdbool.h>
-#include <sys/stat.h>
 #include <string.h>
-#include <stdio.h>
 
 bool blockRightDc = false;
 bool logClicks = false;
