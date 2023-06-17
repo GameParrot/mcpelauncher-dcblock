@@ -6,11 +6,14 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <stdio.h>
-#define  _POSIX_C_SOURCE 200809L
+
 bool blockRightDc = false;
 bool logClicks = false;
 bool hasInited = false; // Workaround mcpelauncher mod loading bug
-
+#if defined(__i386__) || defined(__arm__)
+ssize_t getline(char **restrict lineptr, size_t *restrict n,
+                       FILE *restrict stream);
+#endif
 long getEpochTime() {
     struct timeval tp;
     gettimeofday(&tp, NULL);
