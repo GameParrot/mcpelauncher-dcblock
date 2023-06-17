@@ -12,15 +12,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        abi: ["x86_64", "arm64-v8a", "x86", "armeabi-v7a" ]
+        abi: ["x86_64", "arm64-v8a" ]
         include:
         - abi: x86_64
           ndktarget: x86_64-linux-android-
-        - abi: x86
-          ndktarget: i686-linux-android-
-        - abi: armeabi-v7a
-          openssltarget: android-arm
-          ndktarget: arm-linux-androideabi-
         - abi: arm64-v8a
           openssltarget: android-arm64
           ndktarget: aarch64-linux-android-
