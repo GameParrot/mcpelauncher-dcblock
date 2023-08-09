@@ -28,7 +28,7 @@ int hasConfigChanged(const char *configFilePath, time_t lastCheckTime) {
     struct stat fileStat;
     if (stat(configFilePath, &fileStat) == -1) {
         perror("stat");
-        exit(EXIT_FAILURE);
+        return 0;
     }
     return fileStat.st_mtime > lastCheckTime;
 }
