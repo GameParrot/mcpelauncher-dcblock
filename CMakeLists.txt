@@ -4,8 +4,7 @@ project(mcpelauncherdcblock LANGUAGES C)
 
 set(CMAKE_C_STANDARD 17)
 
-find_library(log-lib log)
-
+find_library(log-lib log android-lib android)
 
 add_library(mcpelauncherdcblock SHARED src/main.c)
-target_link_libraries(mcpelauncherdcblock PUBLIC ${log-lib})
+target_link_libraries(mcpelauncherdcblock PUBLIC ${log-lib} android)
