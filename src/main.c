@@ -157,9 +157,11 @@ int32_t getButtonState(const void* t) {
                         __android_log_print(0, "DCBlock", "[■ ] Mouse down");
                     }
                     oms = currentEpochTime;
-                } else if (logClicks) {
+                } else {
                     leftBlocking = true;
-                    __android_log_print(0, "DCBlock", "[■ ] Suppressed a DC");
+                    if (logClicks) {
+                        __android_log_print(0, "DCBlock", "[■ ] Suppressed a DC");
+                    }
                 }
             }
             leftPrevious = true;
@@ -176,9 +178,11 @@ int32_t getButtonState(const void* t) {
                         __android_log_print(0, "DCBlock", "[ ■] Mouse down");
                     }
                     oms1 = currentEpochTime;
-                } else if (logClicks) {
+                } else {
                     rightBlocking = true;
-                    __android_log_print(0, "DCBlock", "[ ■] Suppressed a DC");
+                    if (logClicks) {
+                        __android_log_print(0, "DCBlock", "[ ■] Suppressed a DC");
+                    }
                 }
             }
             rightPrevious = true;
