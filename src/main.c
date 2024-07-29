@@ -1,4 +1,6 @@
 #include <dlfcn.h>
+#include "main.h"
+#include "imgui.h"
 #include <sys/time.h>
 #include <stdlib.h>
 #include <android/log.h>
@@ -7,6 +9,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <stdlib.h>
 
 char* confPath = "/data/data/com.mojang.minecraftpe/dcblock.conf";
 
@@ -61,16 +64,7 @@ void loadConfFile() {
         }
         fclose(fp);
     } else {
-        // Configuration file not found, create a new one with default values
-        fp = fopen(confPath, "w");
-        if (fp) {
-            fputs("Enabled=true\n", fp);
-            fputs("BlockRightDc=false\n", fp);
-            fputs("LogClicks=false\n", fp);
-            fputs("UseLegacyMousefeed=false\n", fp);
-            fputs("Threshold=50\n", fp);
-            fclose(fp);
-        }
+        saveConfFile();
     }
 
     __android_log_print(ANDROID_LOG_INFO, "DCBlock", "enabled: %s", enabled ? "true" : "false");
@@ -79,6 +73,27 @@ void loadConfFile() {
     __android_log_print(ANDROID_LOG_INFO, "DCBlock", "useLegacyMousefeed: %s", useLegacyMousefeed ? "true" : "false");
     __android_log_print(ANDROID_LOG_INFO, "DCBlock", "threshold: %d", threshold);
 
+}
+
+void putBool(FILE *fp, bool b, char *name) {
+    fprintf(fp, "%s=%s\n", name, (b ? "true" : "false"));
+}
+
+void putInt(FILE *fp, int b, char *name) {
+    fprintf(fp, "%s=%d\n", name, b);
+}
+
+void saveConfFile() {
+    FILE *fp = fopen(confPath, "w");
+    if (fp) {
+        putBool(fp, enabled, "Enabled");
+        putBool(fp, blockRightDc, "BlockRightDc");
+        putBool(fp, logClicks, "LogClicks");
+        putBool(fp, useLegacyMousefeed, "UseLegacyMousefeed");
+        putInt(fp, threshold, "Threshold");
+        fclose(fp);
+    }
+    lastCheckTime = time(NULL);
 }
 
 char (*Mouse_feed_org)(void*, char, signed char, short, short, short, short, bool);
@@ -202,6 +217,8 @@ int32_t getButtonState(const void* t) {
     return i;
 }
 
+
+
 void __attribute__ ((visibility ("default"))) mod_preinit() {
     if (!hasInited) {
         loadConfFile();
@@ -214,6 +231,9 @@ void __attribute__ ((visibility ("default"))) mod_preinit() {
         const char *mouseFeedSymbol = useLegacyMousefeed ? "_ZN11MouseDevice4feedEccssssb" : "_ZN11MouseDevice4feedEcassssb";
         mcpelauncher_preinithook(mouseFeedSymbol, (void *)&Mouse_feed, (void **)&Mouse_feed_org);
         mcpelauncher_preinithook("AMotionEvent_getButtonState", getButtonState, NULL);
+
+        initImgui();
+
         hasInited = true;
     }
 }
