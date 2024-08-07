@@ -37,6 +37,14 @@ int hasConfigChanged(const char *configFilePath, time_t lastCheckTime) {
     return fileStat.st_mtime > lastCheckTime;
 }
 
+void printConfig() {
+    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "enabled: %s", enabled ? "true" : "false");
+    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "blockRightDc: %s", blockRightDc ? "true" : "false");
+    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "logClicks: %s", logClicks ? "true" : "false");
+    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "useLegacyMousefeed: %s", useLegacyMousefeed ? "true" : "false");
+    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "threshold: %d", threshold);
+}
+
 void loadConfFile() {
     FILE *fp = fopen(confPath, "r");
     if (fp) {
@@ -67,11 +75,7 @@ void loadConfFile() {
         saveConfFile();
     }
 
-    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "enabled: %s", enabled ? "true" : "false");
-    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "blockRightDc: %s", blockRightDc ? "true" : "false");
-    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "logClicks: %s", logClicks ? "true" : "false");
-    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "useLegacyMousefeed: %s", useLegacyMousefeed ? "true" : "false");
-    __android_log_print(ANDROID_LOG_INFO, "DCBlock", "threshold: %d", threshold);
+    printConfig();
 
 }
 
@@ -94,6 +98,7 @@ void saveConfFile() {
         fclose(fp);
     }
     lastCheckTime = time(NULL);
+    printConfig();
 }
 
 char (*Mouse_feed_org)(void*, char, signed char, short, short, short, short, bool);
