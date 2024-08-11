@@ -14,7 +14,7 @@
 char* confPath = "/data/data/com.mojang.minecraftpe/dcblock.conf";
 
 bool enabled = true;
-bool blockRightDc = false;
+bool blockRightDc = true;
 bool logClicks = false;
 bool hasInited = false; // Workaround mcpelauncher mod loading bug
 bool useLegacyMousefeed = false;

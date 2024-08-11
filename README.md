@@ -20,6 +20,6 @@ This is a mod for mcpelauncher-manifest that blocks double clicking so you don't
 
 ## Conf
 The conf file is at `<data dir>/dcblock.conf`. Options:  
-`BlockRightDc` - Controls if right double clicks are blocked. Right dcing is allowed on zeqa according to miniguy7, so this is false by default. You should set this to true if you play in scrims.  
+`BlockRightDc` - Controls if right double clicks are blocked.  
 `LogClicks` - Controls if clicks should be logged to console. Useful for debugging or if you want to prove you are using dc block.  
 `UseLegacyMousefeed` - Set this to true if you are using a version below 1.19.60. Otherwise, leave this at false.
