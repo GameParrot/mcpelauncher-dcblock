@@ -1,0 +1,3 @@
+[submodule "properties-parser"]
+	path = properties-parser
+	url = https://github.com/minecraft-linux/properties-parser/
