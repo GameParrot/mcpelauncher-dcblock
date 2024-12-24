@@ -1,2 +1,4 @@
-
-void initImgui();
+class ImGUIOptions {
+public:
+    static void initImgui();
+};
