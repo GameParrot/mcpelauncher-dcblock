@@ -14,18 +14,6 @@
 
 int32_t DCBlock::getButtonState(const AInputEvent* t) {
     long currentEpochTime = getEpochTime();
-    if(currentEpochTime - lastUpdateTime > 5000) {
-        lastUpdateTime = currentEpochTime;
-        if(hasConfigChanged(getPath().c_str())) {
-            Conf::load();
-
-            struct stat fileStat;
-            if(stat(getPath().c_str(), &fileStat) == -1) {
-                perror("stat");
-                exit(EXIT_FAILURE);
-            }
-        }
-    }
 
     int32_t i = AMotionEvent_getButtonState(t);
     if(Conf::enabled) {

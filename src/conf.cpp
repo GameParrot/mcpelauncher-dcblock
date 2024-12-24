@@ -38,6 +38,5 @@ void Conf::save() {
     std::ofstream propertiesFile(getPath());
     if(propertiesFile) {
         conf.save(propertiesFile);
-        onConfEdited();
     }
 }

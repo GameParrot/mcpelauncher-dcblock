@@ -26,7 +26,6 @@ extern "C" void __attribute__((visibility("default"))) mod_preinit() {
     mcpelauncher_preinithook("AMotionEvent_getButtonState", (void *)+[](const AInputEvent *t) -> int32_t { return dcBlock.getButtonState(t); }, nullptr);
 
     ImGUIOptions::initImgui();
-    onConfEdited();
 }
 
 extern "C" __attribute__((visibility("default"))) void mod_init() {

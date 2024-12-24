@@ -97,8 +97,16 @@ void ImGUIOptions::initImgui() {
         changeThreshold.selected = [](void* user) -> bool { return false; };
         changeThreshold.length = 0;
 
+        struct MenuEntryABI reloadConf;
+        reloadConf.name = "Reload config";
+        reloadConf.click = [](void* user) {
+            Conf::load();
+        };
+        reloadConf.selected = [](void* user) -> bool { return false; };
+        reloadConf.length = 0;
+
         struct MenuEntryABI entry;
-        struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, changeThreshold};
+        struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, changeThreshold, reloadConf};
         entry.subentries = entries;
         entry.length = sizeof(entries) / sizeof(struct MenuEntryABI);
         entry.name = "DCBlock";

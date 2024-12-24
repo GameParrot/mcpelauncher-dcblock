@@ -6,7 +6,6 @@ class DCBlock {
 private:
     long omsLeft = 0;
     long omsRight = 0;
-    long lastUpdateTime = 0;
     bool leftPrevious = false;
     bool rightPrevious = false;
     bool leftBlocking = false;

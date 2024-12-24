@@ -6,22 +6,6 @@
 #include <time.h>
 #include <unistd.h>
 
-time_t lastCheckTime;
-int hasConfigChanged(const char *configFilePath) {
-    struct stat fileStat;
-    if(stat(configFilePath, &fileStat) == -1) {
-        perror("stat");
-        return 0;
-    }
-    bool ret = fileStat.st_mtime > lastCheckTime;
-    lastCheckTime = fileStat.st_mtime;
-    return ret;
-}
-
-void onConfEdited() {
-    lastCheckTime = time(NULL);
-}
-
 void printConfig() {
     __android_log_print(ANDROID_LOG_INFO, "DCBlock", "enabled: %s", Conf::enabled ? "true" : "false");
     __android_log_print(ANDROID_LOG_INFO, "DCBlock", "blockRightDc: %s", Conf::blockRightDc ? "true" : "false");
