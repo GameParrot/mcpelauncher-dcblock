@@ -4,56 +4,10 @@
 #include <stdio.h>
 #include "conf.h"
 #include "imgui.h"
+#include "util.h"
 
-struct MenuEntryABI {
-    const char* name;
-    void* user;
-    bool (*selected)(void* user);
-    void (*click)(void* user);
-    size_t length;
-    struct MenuEntryABI* subentries;
-};
-
-struct control {
-    int type;
-    union {
-        struct {
-            const char* label;
-            void* user;
-            void (*onClick)(void* user);
-        } button;
-        struct {
-            const char* label;
-            int min;
-            int def;
-            int max;
-            void* user;
-            void (*onChange)(void* user, int value);
-        } sliderint;
-        struct {
-            const char* label;
-            float min;
-            float def;
-            float max;
-            void* user;
-            void (*onChange)(void* user, float value);
-        } sliderfloat;
-        struct {
-            char* label;
-            int size;  // 0 normal/ 1 small titel...
-        } text;
-        struct {
-            const char* label;
-            const char* def;
-            const char* placeholder;
-            void* user;
-            void (*onChange)(void* user, const char* value);
-        } textinput;
-    } data;
-};
-
-typedef void (*showwindow)(const char* title, int isModal, void* user, void (*onClose)(void* user), int count, struct control* controls);
-showwindow mcpelauncher_show_window;
+showwindow ImGUIOptions::mcpelauncher_show_window;
+closewindow ImGUIOptions::mcpelauncher_close_window;
 
 void ImGUIOptions::initImgui() {
     void* libmenu = dlopen("libmcpelauncher_menu.so", 0);
@@ -74,10 +28,26 @@ void ImGUIOptions::initImgui() {
         blockRightDc.length = 0;
 
         struct MenuEntryABI logClicks;
-        logClicks.name = "Log clicks";
+        logClicks.name = "Log clicks to console";
         logClicks.click = [](void* user) { Conf::logClicks = !Conf::logClicks; Conf::save(); };
         logClicks.selected = [](void* user) -> bool { return Conf::logClicks; };
         logClicks.length = 0;
+
+        struct MenuEntryABI showLogWindow;
+        showLogWindow.name = "Show log window";
+        showLogWindow.click = [](void* user) {
+            ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+            Conf::showLogWindow = !Conf::showLogWindow;
+            Conf::save();
+            if(Conf::showLogWindow) {
+                inst->updateLogWindow();
+            } else {
+                inst->closeLogWindow();
+            }
+        };
+        showLogWindow.selected = [](void* user) -> bool { return Conf::showLogWindow; };
+        showLogWindow.length = 0;
+        showLogWindow.user = (void*)this;
 
         struct MenuEntryABI changeThreshold;
         changeThreshold.name = "Change threshold";
@@ -100,13 +70,15 @@ void ImGUIOptions::initImgui() {
         struct MenuEntryABI reloadConf;
         reloadConf.name = "Reload config";
         reloadConf.click = [](void* user) {
-            Conf::load();
+            ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+            Conf::load(*inst);
         };
+        reloadConf.user = (void*)this;
         reloadConf.selected = [](void* user) -> bool { return false; };
         reloadConf.length = 0;
 
         struct MenuEntryABI entry;
-        struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, changeThreshold, reloadConf};
+        struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, showLogWindow, changeThreshold, reloadConf};
         entry.subentries = entries;
         entry.length = sizeof(entries) / sizeof(struct MenuEntryABI);
         entry.name = "DCBlock";
@@ -114,5 +86,31 @@ void ImGUIOptions::initImgui() {
         mcpelauncher_addmenu(1, &entry);
 
         *(void**)(&mcpelauncher_show_window) = dlsym(libmenu, "mcpelauncher_show_window");
+        *(void**)(&mcpelauncher_close_window) = dlsym(libmenu, "mcpelauncher_close_window");
     }
+}
+
+void ImGUIOptions::addClick(int button, bool supressed) {
+    std::string newStr = (button == 1 ? "[Left] " : "[Right] ") + std::string((supressed ? "Supressed a DC" : "Mouse down"));
+    clickLog = newStr + "\n" + clickLog;
+    updateLogWindow();
+}
+
+void ImGUIOptions::updateLogWindow() {
+    struct control logWindow;
+    logWindow.type = 3;
+    logWindow.data.text.label = (char*)clickLog.c_str();
+
+    std::string infoText = "Enabled: " + formatBool(Conf::enabled) + " | Block right DC: " + formatBool(Conf::blockRightDc) + " | Threshold: " + std::to_string(Conf::threshold) + "\n";
+    struct control infoBox;
+    infoBox.type = 3;
+    infoBox.data.text.label = (char*)infoText.c_str();
+
+    struct control entries[] = {infoBox, logWindow};
+
+    mcpelauncher_show_window("DCBlock", 0, NULL, [](void* user) {}, 2, entries);
+}
+
+void ImGUIOptions::closeLogWindow() {
+    mcpelauncher_close_window("DCBlock");
 }

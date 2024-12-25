@@ -22,3 +22,7 @@ long getEpochTime() {
 std::string getPath() {
     return "/data/data/com.mojang.minecraftpe/dcblock.conf";
 }
+
+std::string formatBool(bool v) {
+    return v ? "true" : "false";
+}

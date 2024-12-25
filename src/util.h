@@ -6,3 +6,5 @@ void printConfig();
 long getEpochTime();
 
 std::string getPath();
+
+std::string formatBool(bool v);
