@@ -9,6 +9,8 @@ struct Conf {
     static bool useLegacyMousefeed;
     static int threshold;
 
+    static bool locked;
+
     static void load(ImGUIOptions opts);
     static void save();
 };

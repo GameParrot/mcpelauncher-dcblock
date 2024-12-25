@@ -10,11 +10,14 @@ private:
     static showwindow mcpelauncher_show_window;
     static closewindow mcpelauncher_close_window;
 
+    void showLockedAlert();
+
 public:
     void initImgui();
     void addClick(int button, bool supressed);
     void updateLogWindow();
-    void closeLogWindow();
+    static void closeLogWindow();
+    static void showConfirmPrompt(char* label, char* title, void* user, void (*onCancel)(void* user), void (*onConfirm)(void* user));
 };
 
 struct MenuEntryABI {

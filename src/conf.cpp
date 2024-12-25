@@ -10,6 +10,8 @@ bool Conf::logClicks = false;
 bool Conf::showLogWindow = false;
 int Conf::threshold = 50;
 
+bool Conf::locked = false;
+
 static properties::property_list conf('=');
 static properties::property<bool> enabled(conf, "Enabled", true);
 static properties::property<bool> blockRightDc(conf, "BlockRightDc", true);

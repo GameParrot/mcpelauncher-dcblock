@@ -18,10 +18,14 @@ void ImGUIOptions::initImgui() {
         struct MenuEntryABI enabled;
         enabled.name = "Enabled";
         enabled.click = [](void* user) {
+            ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+            if(Conf::locked) {
+                inst->showLockedAlert();
+                return;
+            }
             Conf::enabled = !Conf::enabled;
             Conf::save();
             if(Conf::showLogWindow) {
-                ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
                 inst->updateLogWindow();
             }
         };
@@ -32,10 +36,14 @@ void ImGUIOptions::initImgui() {
         struct MenuEntryABI blockRightDc;
         blockRightDc.name = "Block right DC";
         blockRightDc.click = [](void* user) {
+            ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+            if(Conf::locked) {
+                inst->showLockedAlert();
+                return;
+            }
             Conf::blockRightDc = !Conf::blockRightDc;
             Conf::save();
             if(Conf::showLogWindow) {
-                ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
                 inst->updateLogWindow();
             }
         };
@@ -68,6 +76,11 @@ void ImGUIOptions::initImgui() {
         struct MenuEntryABI changeThreshold;
         changeThreshold.name = "Change threshold";
         changeThreshold.click = [](void* user) {
+            if(Conf::locked) {
+                ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+                inst->showLockedAlert();
+                return;
+            }
             struct control thresholdWindow;
             thresholdWindow.data.sliderint.min = 1;
             thresholdWindow.data.sliderint.max = 150;
@@ -82,16 +95,41 @@ void ImGUIOptions::initImgui() {
         };
         changeThreshold.selected = [](void* user) -> bool { return false; };
         changeThreshold.length = 0;
+        changeThreshold.user = (void*)this;
 
         struct MenuEntryABI reloadConf;
         reloadConf.name = "Reload config";
         reloadConf.click = [](void* user) {
             ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+            if(Conf::locked) {
+                inst->showLockedAlert();
+                return;
+            }
             Conf::load(*inst);
         };
         reloadConf.user = (void*)this;
         reloadConf.selected = [](void* user) -> bool { return false; };
         reloadConf.length = 0;
+
+        struct MenuEntryABI lock;
+        lock.name = "Lock";
+        lock.click = [](void* user) {
+            ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+            if(Conf::locked) {
+                inst->showLockedAlert();
+                return;
+            }
+            inst->showConfirmPrompt((char*)"Are you sure you want to lock?\nYou will not be able to change settings until restart.", (char*)"Lock", user, [](void* user) { mcpelauncher_close_window("Lock"); }, [](void* user) {
+                mcpelauncher_close_window("Lock");
+                Conf::locked = true;
+                if(Conf::showLogWindow) {
+                    ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+                    inst->updateLogWindow();
+                } });
+        };
+        lock.user = (void*)this;
+        lock.selected = [](void* user) -> bool { return Conf::locked; };
+        lock.length = 0;
 
         struct MenuEntryABI entry;
         struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, showLogWindow, changeThreshold, reloadConf};
@@ -122,7 +160,7 @@ void ImGUIOptions::updateLogWindow() {
     logWindow.type = 3;
     logWindow.data.text.label = (char*)clickLog.c_str();
 
-    std::string infoText = "Enabled: " + formatBool(Conf::enabled) + " | Block right DC: " + formatBool(Conf::blockRightDc) + " | Threshold: " + std::to_string(Conf::threshold) + "\n";
+    std::string infoText = "Enabled: " + formatBool(Conf::enabled) + " | Block right DC: " + formatBool(Conf::blockRightDc) + " | Threshold: " + std::to_string(Conf::threshold) + (Conf::locked ? " | Locked" : "") + "\n";
     struct control infoBox;
     infoBox.type = 3;
     infoBox.data.text.label = (char*)infoText.c_str();
@@ -134,4 +172,33 @@ void ImGUIOptions::updateLogWindow() {
 
 void ImGUIOptions::closeLogWindow() {
     mcpelauncher_close_window("DCBlock");
+}
+
+void ImGUIOptions::showLockedAlert() {
+    struct control alertWindow;
+    alertWindow.type = 3;
+    alertWindow.data.text.label = (char*)"DCBlock is locked! Restart your game to change settings.";
+    mcpelauncher_show_window("Locked", 1, NULL, [](void* user) {}, 1, &alertWindow);
+}
+
+void ImGUIOptions::showConfirmPrompt(char* label, char* title, void* user, void (*onCancel)(void* user), void (*onConfirm)(void* user)) {
+    struct control alertWindow;
+    alertWindow.type = 3;
+    alertWindow.data.text.label = label;
+
+    struct control cancelButton;
+    cancelButton.data.button.label = "Cancel";
+    cancelButton.data.button.user = user;
+    cancelButton.data.button.onClick = onCancel;
+    cancelButton.type = 0;
+
+    struct control okButton;
+    okButton.data.button.label = "OK";
+    okButton.data.button.user = user;
+    okButton.data.button.onClick = onConfirm;
+    okButton.type = 0;
+
+    struct control entries[] = {alertWindow, cancelButton, okButton};
+
+    mcpelauncher_show_window(title, 1, NULL, [](void* user) {}, 3, entries);
 }
