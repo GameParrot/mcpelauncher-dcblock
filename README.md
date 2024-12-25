@@ -1,6 +1,6 @@
 # mcpelauncher-dcblock
 
-This is a mod for mcpelauncher-manifest that blocks double clicking so you don't get banned from servers like zeqa.
+This is a mod for mcpelauncher-manifest that blocks double clicking so you don't get banned from servers like zeqa. Supported Minecraft versions: 1.20.50 - latest
 
 
 ## Building
@@ -22,4 +22,3 @@ This is a mod for mcpelauncher-manifest that blocks double clicking so you don't
 The conf file is at `<data dir>/dcblock.conf`. Options:  
 `BlockRightDc` - Controls if right double clicks are blocked.  
 `LogClicks` - Controls if clicks should be logged to console. Useful for debugging or if you want to prove you are using dc block.  
-`UseLegacyMousefeed` - Set this to true if you are using a version below 1.19.60. Otherwise, leave this at false.
