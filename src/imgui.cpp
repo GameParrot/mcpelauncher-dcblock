@@ -109,6 +109,9 @@ void ImGUIOptions::initImgui() {
 void ImGUIOptions::addClick(int button, bool supressed) {
     std::string newStr = (button == 1 ? "[Left] " : "[Right] ") + std::string((supressed ? "Supressed a DC" : "Mouse down"));
     clickLog = newStr + "\n" + clickLog;
+    if(clickLog.length() > 10000) {
+        clickLog = clickLog.substr(0, 9000);
+    }
     if(Conf::showLogWindow) {
         updateLogWindow();
     }
