@@ -23,9 +23,7 @@ int32_t DCBlock::getButtonState(const AInputEvent* t) {
     if(Conf::enabled) {
         if(i & 1) {
             if(!leftPrevious) {
-                if(Conf::showLogWindow) {
-                    gui.addClick(1, currentEpochTime - omsLeft <= Conf::threshold);
-                }
+                gui.addClick(1, currentEpochTime - omsLeft <= Conf::threshold);
                 if(currentEpochTime - omsLeft > Conf::threshold) {
                     if(Conf::logClicks) {
                         __android_log_print(0, "DCBlock", "[■ ] Mouse down");
@@ -47,9 +45,7 @@ int32_t DCBlock::getButtonState(const AInputEvent* t) {
         }
         if(i & 2) {
             if(!rightPrevious && Conf::blockRightDc) {
-                if(Conf::showLogWindow) {
-                    gui.addClick(2, currentEpochTime - omsRight <= Conf::threshold);
-                }
+                gui.addClick(2, currentEpochTime - omsRight <= Conf::threshold);
                 if(currentEpochTime - omsRight > Conf::threshold) {
                     if(Conf::logClicks) {
                         __android_log_print(0, "DCBlock", "[ ■] Mouse down");
