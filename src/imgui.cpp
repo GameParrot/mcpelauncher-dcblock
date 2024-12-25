@@ -17,15 +17,31 @@ void ImGUIOptions::initImgui() {
         *(void**)(&mcpelauncher_addmenu) = dlsym(libmenu, "mcpelauncher_addmenu");
         struct MenuEntryABI enabled;
         enabled.name = "Enabled";
-        enabled.click = [](void* user) { Conf::enabled = !Conf::enabled; Conf::save(); };
+        enabled.click = [](void* user) {
+            Conf::enabled = !Conf::enabled;
+            Conf::save();
+            if(Conf::showLogWindow) {
+                ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+                inst->updateLogWindow();
+            }
+        };
         enabled.selected = [](void* user) -> bool { return Conf::enabled; };
         enabled.length = 0;
+        enabled.user = (void*)this;
 
         struct MenuEntryABI blockRightDc;
         blockRightDc.name = "Block right DC";
-        blockRightDc.click = [](void* user) { Conf::blockRightDc = !Conf::blockRightDc; Conf::save(); };
+        blockRightDc.click = [](void* user) {
+            Conf::blockRightDc = !Conf::blockRightDc;
+            Conf::save();
+            if(Conf::showLogWindow) {
+                ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+                inst->updateLogWindow();
+            }
+        };
         blockRightDc.selected = [](void* user) -> bool { return Conf::blockRightDc; };
         blockRightDc.length = 0;
+        blockRightDc.user = (void*)this;
 
         struct MenuEntryABI logClicks;
         logClicks.name = "Log clicks to console";
@@ -62,7 +78,7 @@ void ImGUIOptions::initImgui() {
             };
             thresholdWindow.type = 1;
 
-            mcpelauncher_show_window("Threshold", 1, NULL, [](void* user) { Conf::save(); }, 1, &thresholdWindow);
+            mcpelauncher_show_window("Threshold", 1, user, [](void* user) { Conf::save(); }, 1, &thresholdWindow);
         };
         changeThreshold.selected = [](void* user) -> bool { return false; };
         changeThreshold.length = 0;
