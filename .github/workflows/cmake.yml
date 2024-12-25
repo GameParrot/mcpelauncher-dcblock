@@ -22,7 +22,9 @@ jobs:
           ndktarget: aarch64-linux-android-
     steps:
     - run: sudo apt update && sudo apt install llvm gcc ninja-build
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        submodules: 'true'
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
       with:
@@ -36,7 +38,7 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target mcpelauncherdcblock
     
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: dcblock-${{format('android-{0}', matrix.abi)}}
         path: |
