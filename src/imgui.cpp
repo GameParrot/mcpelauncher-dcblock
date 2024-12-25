@@ -109,8 +109,8 @@ void ImGUIOptions::initImgui() {
 void ImGUIOptions::addClick(int button, bool supressed) {
     std::string newStr = (button == 1 ? "[Left] " : "[Right] ") + std::string((supressed ? "Supressed a DC" : "Mouse down"));
     clickLog = newStr + "\n" + clickLog;
-    if(clickLog.length() > 10000) {
-        clickLog = clickLog.substr(0, 9000);
+    if(clickLog.length() > 50000) {
+        clickLog = clickLog.substr(0, 49000);
     }
     if(Conf::showLogWindow) {
         updateLogWindow();
@@ -129,7 +129,7 @@ void ImGUIOptions::updateLogWindow() {
 
     struct control entries[] = {infoBox, logWindow};
 
-    mcpelauncher_show_window("DCBlock", 0, NULL, [](void* user) {}, 2, entries);
+    mcpelauncher_show_window("DCBlock", 0, NULL, [](void* user) { Conf::showLogWindow = false; Conf::save(); }, 2, entries);
 }
 
 void ImGUIOptions::closeLogWindow() {
