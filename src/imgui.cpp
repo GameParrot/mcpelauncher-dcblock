@@ -1,7 +1,6 @@
-#include <sys/stat.h>
 #include <dlfcn.h>
 #include <stdbool.h>
-#include <stdio.h>
+#include <thread>
 #include "conf.h"
 #include "imgui.h"
 #include "util.h"
@@ -119,8 +118,8 @@ void ImGUIOptions::initImgui() {
                 inst->showLockedAlert();
                 return;
             }
-            inst->showConfirmPrompt((char*)"Are you sure you want to lock?\nYou will not be able to change settings until restart.", (char*)"Lock", user, [](void* user) { mcpelauncher_close_window("Lock"); }, [](void* user) {
-                mcpelauncher_close_window("Lock");
+            inst->showConfirmPrompt((char*)"Are you sure you want to lock?\nYou will not be able to change settings until restart.", (char*)"Lock", user, [](void* user) { std::thread([]() { mcpelauncher_close_window("Lock"); }).detach(); }, [](void* user) {
+                std::thread([]() { mcpelauncher_close_window("Lock"); }).detach();
                 Conf::locked = true;
                 if(Conf::showLogWindow) {
                     ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
@@ -132,7 +131,7 @@ void ImGUIOptions::initImgui() {
         lock.length = 0;
 
         struct MenuEntryABI entry;
-        struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, showLogWindow, changeThreshold, reloadConf};
+        struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, showLogWindow, changeThreshold, reloadConf, lock};
         entry.subentries = entries;
         entry.length = sizeof(entries) / sizeof(struct MenuEntryABI);
         entry.name = "DCBlock";
