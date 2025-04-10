@@ -1,7 +1,6 @@
-#include <sys/stat.h>
 #include <dlfcn.h>
 #include <stdbool.h>
-#include <stdio.h>
+#include <thread>
 #include "conf.h"
 #include "imgui.h"
 #include "util.h"
@@ -119,8 +118,8 @@ void ImGUIOptions::initImgui() {
                 inst->showLockedAlert();
                 return;
             }
-            inst->showConfirmPrompt((char*)"Are you sure you want to lock?\nYou will not be able to change settings until restart.", (char*)"Lock", user, [](void* user) { mcpelauncher_close_window("Lock"); }, [](void* user) {
-                mcpelauncher_close_window("Lock");
+            inst->showConfirmPrompt((char*)"Are you sure you want to lock?\nYou will not be able to change settings until restart.", (char*)"Lock", user, [](void* user) { std::thread([]() { mcpelauncher_close_window("Lock"); }).detach(); }, [](void* user) {
+                std::thread([]() { mcpelauncher_close_window("Lock"); }).detach();
                 Conf::locked = true;
                 if(Conf::showLogWindow) {
                     ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
@@ -132,7 +131,7 @@ void ImGUIOptions::initImgui() {
         lock.length = 0;
 
         struct MenuEntryABI entry;
-        struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, showLogWindow, changeThreshold, reloadConf};
+        struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, showLogWindow, changeThreshold, reloadConf, lock};
         entry.subentries = entries;
         entry.length = sizeof(entries) / sizeof(struct MenuEntryABI);
         entry.name = "DCBlock";
@@ -159,11 +158,13 @@ void ImGUIOptions::updateLogWindow() {
     struct control logWindow;
     logWindow.type = 3;
     logWindow.data.text.label = (char*)clickLog.c_str();
+    logWindow.data.text.size = 0;
 
     std::string infoText = "Enabled: " + formatBool(Conf::enabled) + " | Block right DC: " + formatBool(Conf::blockRightDc) + " | Threshold: " + std::to_string(Conf::threshold) + (Conf::locked ? " | Locked" : "") + "\n";
     struct control infoBox;
     infoBox.type = 3;
     infoBox.data.text.label = (char*)infoText.c_str();
+    infoBox.data.text.size = 0;
 
     struct control entries[] = {infoBox, logWindow};
 

@@ -1,13 +1,5 @@
-#include <dlfcn.h>
 #include "util.h"
-#include <sys/time.h>
-#include <stdlib.h>
 #include <android/log.h>
-#include <stdbool.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <stdlib.h>
 #include "dcblock.h"
 #include "conf.h"
 
@@ -16,61 +8,44 @@ void DCBlock::init() {
     Conf::load(gui);
 }
 
-int32_t DCBlock::getButtonState(const AInputEvent* t) {
+bool DCBlock::onMouseClick(int button) {
+    if(!Conf::enabled) {
+        return false;
+    }
     long currentEpochTime = getEpochTime();
-
-    int32_t i = AMotionEvent_getButtonState(t);
-    if(Conf::enabled) {
-        if(i & 1) {
-            if(!leftPrevious) {
-                gui.addClick(1, currentEpochTime - omsLeft <= Conf::threshold);
-                if(currentEpochTime - omsLeft > Conf::threshold) {
-                    if(Conf::logClicks) {
-                        __android_log_print(0, "DCBlock", "[■ ] Mouse down");
-                    }
-                    omsLeft = currentEpochTime;
-                } else {
-                    leftBlocking = true;
-                    if(Conf::logClicks) {
-                        __android_log_print(0, "DCBlock", "[■ ] Suppressed a DC");
-                    }
-                }
+    switch(button) {
+    case 1:
+        gui.addClick(1, currentEpochTime - omsLeft <= Conf::threshold);
+        if(currentEpochTime - omsLeft > Conf::threshold) {
+            if(Conf::logClicks) {
+                __android_log_print(0, "DCBlock", "[■ ] Mouse down");
             }
-            leftPrevious = true;
+            omsLeft = currentEpochTime;
+            return false;
         } else {
-            if(leftPrevious) {
-                leftBlocking = false;
+            if(Conf::logClicks) {
+                __android_log_print(0, "DCBlock", "[■ ] Suppressed a DC");
             }
-            leftPrevious = false;
+            return true;
         }
-        if(i & 2) {
-            if(!rightPrevious && Conf::blockRightDc) {
-                gui.addClick(2, currentEpochTime - omsRight <= Conf::threshold);
-                if(currentEpochTime - omsRight > Conf::threshold) {
-                    if(Conf::logClicks) {
-                        __android_log_print(0, "DCBlock", "[ ■] Mouse down");
-                    }
-                    omsRight = currentEpochTime;
-                } else {
-                    rightBlocking = true;
-                    if(Conf::logClicks) {
-                        __android_log_print(0, "DCBlock", "[ ■] Suppressed a DC");
-                    }
-                }
+    case 2:
+        if(!Conf::blockRightDc) {
+            return false;
+        }
+        gui.addClick(2, currentEpochTime - omsRight <= Conf::threshold);
+        if(currentEpochTime - omsRight > Conf::threshold) {
+            if(Conf::logClicks) {
+                __android_log_print(0, "DCBlock", "[ ■] Mouse down");
             }
-            rightPrevious = true;
+            omsRight = currentEpochTime;
+            return false;
         } else {
-            if(rightPrevious) {
-                rightBlocking = false;
+            if(Conf::logClicks) {
+                __android_log_print(0, "DCBlock", "[ ■] Suppressed a DC");
             }
-            rightPrevious = false;
+            return true;
         }
+    default:
+        return false;
     }
-    if(leftBlocking) {
-        i = i & ~1;
-    }
-    if(rightBlocking) {
-        i = i & ~2;
-    }
-    return i;
 }
