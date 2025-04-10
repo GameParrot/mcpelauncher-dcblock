@@ -158,11 +158,13 @@ void ImGUIOptions::updateLogWindow() {
     struct control logWindow;
     logWindow.type = 3;
     logWindow.data.text.label = (char*)clickLog.c_str();
+    logWindow.data.text.size = 0;
 
     std::string infoText = "Enabled: " + formatBool(Conf::enabled) + " | Block right DC: " + formatBool(Conf::blockRightDc) + " | Threshold: " + std::to_string(Conf::threshold) + (Conf::locked ? " | Locked" : "") + "\n";
     struct control infoBox;
     infoBox.type = 3;
     infoBox.data.text.label = (char*)infoText.c_str();
+    infoBox.data.text.size = 0;
 
     struct control entries[] = {infoBox, logWindow};
 
