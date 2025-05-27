@@ -3,6 +3,7 @@
 
 struct Conf {
     static bool enabled;
+    static bool fromMouseUp;
     static bool blockRightDc;
     static bool logClicks;
     static bool showLogWindow;

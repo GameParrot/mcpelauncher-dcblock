@@ -25,10 +25,7 @@ extern "C" __attribute__((visibility("default"))) void mod_init() {
             void* window = game_window_get_primary_window();
             if(window) {
                 game_window_add_mouse_button_callback(window, NULL, [](void* user, double x, double y, int button, int action) -> bool {
-                    if(action != 0) {
-                        return false;
-                    }
-                    return dcBlock.onMouseClick(button);
+                    return dcBlock.onMouseClick(button, action == 0);
                 });
             } else {
                 __android_log_print(ANDROID_LOG_ERROR, "DCBlock", "Failed to initialize: game_window_get_primary_window returned null");

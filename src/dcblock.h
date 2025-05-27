@@ -8,6 +8,6 @@ private:
     ImGUIOptions gui;
 
 public:
-    bool onMouseClick(int button);
+    bool onMouseClick(int button, bool down);
     void init();
 };

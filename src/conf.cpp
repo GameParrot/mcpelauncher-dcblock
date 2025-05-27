@@ -5,6 +5,7 @@
 #include <fstream>
 
 bool Conf::enabled = true;
+bool Conf::fromMouseUp = false;
 bool Conf::blockRightDc = true;
 bool Conf::logClicks = false;
 bool Conf::showLogWindow = false;
@@ -14,6 +15,7 @@ bool Conf::locked = false;
 
 static properties::property_list conf('=');
 static properties::property<bool> enabled(conf, "Enabled", true);
+static properties::property<bool> fromMouseUp(conf, "FromMouseUp", false);
 static properties::property<bool> blockRightDc(conf, "BlockRightDc", true);
 static properties::property<bool> logClicks(conf, "LogClicks", false);
 static properties::property<bool> showLogWindow(conf, "ShowLogWindow", false);

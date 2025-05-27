@@ -32,6 +32,24 @@ void ImGUIOptions::initImgui() {
         enabled.length = 0;
         enabled.user = (void*)this;
 
+        struct MenuEntryABI fromMouseUp;
+        fromMouseUp.name = "From mouse up";
+        fromMouseUp.click = [](void* user) {
+            ImGUIOptions* inst = static_cast<ImGUIOptions*>(user);
+            if(Conf::locked) {
+                inst->showLockedAlert();
+                return;
+            }
+            Conf::fromMouseUp = !Conf::fromMouseUp;
+            Conf::save();
+            if(Conf::showLogWindow) {
+                inst->updateLogWindow();
+            }
+        };
+        fromMouseUp.selected = [](void* user) -> bool { return Conf::fromMouseUp; };
+        fromMouseUp.length = 0;
+        fromMouseUp.user = (void*)this;
+
         struct MenuEntryABI blockRightDc;
         blockRightDc.name = "Block right DC";
         blockRightDc.click = [](void* user) {
@@ -131,7 +149,7 @@ void ImGUIOptions::initImgui() {
         lock.length = 0;
 
         struct MenuEntryABI entry;
-        struct MenuEntryABI entries[] = {enabled, blockRightDc, logClicks, showLogWindow, changeThreshold, reloadConf, lock};
+        struct MenuEntryABI entries[] = {enabled, fromMouseUp, blockRightDc, logClicks, showLogWindow, changeThreshold, reloadConf, lock};
         entry.subentries = entries;
         entry.length = sizeof(entries) / sizeof(struct MenuEntryABI);
         entry.name = "DCBlock";
@@ -160,7 +178,7 @@ void ImGUIOptions::updateLogWindow() {
     logWindow.data.text.label = (char*)clickLog.c_str();
     logWindow.data.text.size = 0;
 
-    std::string infoText = "Enabled: " + formatBool(Conf::enabled) + " | Block right DC: " + formatBool(Conf::blockRightDc) + " | Threshold: " + std::to_string(Conf::threshold) + (Conf::locked ? " | Locked" : "") + "\n";
+    std::string infoText = "Enabled: " + formatBool(Conf::enabled) + " | Block right DC: " + formatBool(Conf::blockRightDc) + " | Threshold: " + std::to_string(Conf::threshold) + (Conf::fromMouseUp ? " | From mosue up" : "") + +(Conf::locked ? " | Locked" : "") + "\n";
     struct control infoBox;
     infoBox.type = 3;
     infoBox.data.text.label = (char*)infoText.c_str();
